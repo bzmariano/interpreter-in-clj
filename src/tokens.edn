@@ -1,0 +1,39 @@
+{\+ :plus
+ \- :minus
+ \_ :underscore
+ \* :asterisk
+ \' :squot
+ \" :dquot
+ \: :colon
+ \; :semi-colon
+ \, :comma
+ \{ :lbrace
+ \} :rbrace
+ \( :lparen
+ \) :r-paren
+ \[ :lbracket
+ \] :rbracket
+ \! :not
+ \= :assign
+ \| :or
+ \& :addr
+ \/ :slash
+ \\ :bslash
+ \? :qmark
+ \< :lt
+ \> :gt
+ \. :dot
+ \% :mod
+ "==" :eq
+ "!=" :neq
+ "<=" :geq
+ ">=" :leq
+ "let" :let
+ "const " :const
+ "for" :for
+ "if" :if
+ "else" :else
+ "func" :func
+ "return" :ret}
+
+
