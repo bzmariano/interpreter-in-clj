@@ -55,7 +55,7 @@
   (loop [input (seq code-string)
          result-acc []]
     (if (empty? input)
-      result-acc
+      (conj result-acc (->TokenLiteral :eof ""))
       (let [token-literal (lexical-analysis input tokens-table)
             literal-length (->> token-literal :literal str count)
             input-remainder (->> (drop literal-length input)
