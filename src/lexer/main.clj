@@ -1,7 +1,8 @@
 (ns lexer.main
   (:require
    [clojure.edn :as edn]
-   [clojure.pprint :as pp]))
+   [clojure.pprint :as pp]
+   [clojure.string :as str]))
 
 (set! *warn-on-reflection* true)
 
@@ -64,13 +65,16 @@
 ;;
 
 (defn -main
-  ([] (pp/pprint "function argument is missing"))
-  ([chars] (pp/pprint (lexer (apply str chars)
-                             tokens-table))))
+  ([] [])
+  ([& args]
+   (let [args (when (seq? args)
+                (str/join "\n" args))]
+     (pp/pprint
+      (lexer args tokens-table)))))
 
 (comment
   tokens-table
   (-main "let")
   (-main "= ")
-  (-main "let x = 1 == 2; $"))
-
+  (-main "const x = 4; x == 5 ? 1 : 0;")
+  (-main "$$"))

@@ -10,7 +10,7 @@
  \{ :lbrace
  \} :rbrace
  \( :lparen
- \) :r-paren
+ \) :rparen
  \[ :lbracket
  \] :rbracket
  \! :not
