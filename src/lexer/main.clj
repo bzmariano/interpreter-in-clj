@@ -51,17 +51,18 @@
 ;;
 
 (defn lexer
-  [code-string tokens-table]
-  (loop [input (seq code-string)
-         result-acc []]
-    (if (empty? input)
-      (conj result-acc (->TokenLiteral :eof ""))
-      (let [token-literal (lexical-analysis input tokens-table)
-            literal-length (->> token-literal :literal str count)
-            input-remainder (->> (drop literal-length input)
-                                 (drop-while #(Character/isWhitespace ^Character %)))]
-        (recur input-remainder
-               (conj result-acc token-literal))))))
+  ([code-string tokens-table]
+   (lexer code-string tokens-table []))
+  ([code-string tokens-table acc]
+   (if (empty? code-string)
+     (conj acc (->TokenLiteral :eof ""))
+     (let [token-literal (lexical-analysis code-string tokens-table)
+           literal-length (->> token-literal :literal str count)
+           input-remainder (->> (drop literal-length code-string)
+                                (drop-while #(Character/isWhitespace ^Character %)))]
+       (recur input-remainder
+              tokens-table
+              (conj acc token-literal))))))
 ;;
 
 (defn -main
@@ -76,5 +77,5 @@
   tokens-table
   (-main "let")
   (-main "= ")
-  (-main "const x = 4; x == 5 ? 1 : 0;")
+  (-main "let x = 4; x == 5 ? 1 : 0;")
   (-main "$$"))
