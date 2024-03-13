@@ -6,13 +6,15 @@
 
 (set! *warn-on-reflection* true)
 
-(defrecord TokenLiteral [token literal])
+(defn ->TokenLiteral
+  [t l]
+  {:token t :literal l})
 
 (def tokens-table
   (edn/read-string (slurp "src/tokens.edn")))
 
 (defmulti lexical-analysis
-  (fn [[^Character a & _] _]
+  (fn [[^Character a] _]
     (cond
       (Character/isLetter a) :letter
       (Character/isDigit a) :digit
@@ -22,10 +24,10 @@
   [string table]
   (let [literal (->> string
                      (take-while #(Character/isLetter ^Character %))
-                     (apply str))]
-    (if-let [token (get table literal)]
-      (->TokenLiteral token literal)
-      (->TokenLiteral :ident literal))))
+                     (apply str))
+        token (or (get table literal)
+                  :ident)]
+    (->TokenLiteral token literal)))
 
 (defmethod lexical-analysis :digit
   [string _]
@@ -37,45 +39,41 @@
 
 (defmethod lexical-analysis :other
   [string table]
-  (let [[a b] (->> string
-                   (take-while
-                    #(not
-                      (or (Character/isLetterOrDigit ^Character %)
-                          (Character/isSpaceChar ^Character %)))))
-        double-char (str a b)]
-    (if-let [token (get table double-char)]
-      (->TokenLiteral token double-char)
-      (if-let [token (get table a)]
-        (->TokenLiteral token (str a))
-        (->TokenLiteral :illegal (str a))))))
+  (let [not-letter-or-digit? #(not
+                               (or (Character/isLetterOrDigit ^Character %)
+                                   (Character/isSpaceChar ^Character %)))
+        [a b] (->> string
+                   (take-while not-letter-or-digit?))
+        token (or (get table (str a b))
+                  (get table a)
+                  :illegal)]
+    (->TokenLiteral token (str a))))
 ;;
 
 (defn lexer
-  ([code-string tokens-table]
-   (lexer code-string tokens-table []))
-  ([code-string tokens-table acc]
-   (if (empty? code-string)
-     (conj acc (->TokenLiteral :eof ""))
-     (let [token-literal (lexical-analysis code-string tokens-table)
-           literal-length (->> token-literal :literal str count)
-           input-remainder (->> (drop literal-length code-string)
-                                (drop-while #(Character/isWhitespace ^Character %)))]
-       (recur input-remainder
-              tokens-table
-              (conj acc token-literal))))))
+  [code-string tokens-table]
+  (loop [cs code-string
+         acc (transient [])]
+    (if (empty? cs)
+      (->> (conj! acc (->TokenLiteral :eof ""))
+           persistent!)
+      (let [token-literal (lexical-analysis cs tokens-table)
+            literal-length (-> token-literal :literal str count)
+            cs-remainder (->> (drop literal-length cs)
+                              (drop-while #(Character/isWhitespace ^Character %)))]
+        (recur cs-remainder
+               (conj! acc token-literal))))))
 ;;
 
 (defn -main
   ([] [])
   ([& args]
-   (let [args (when (seq? args)
-                (str/join "\n" args))]
-     (pp/pprint
-      (lexer args tokens-table)))))
+   (let [args (str/join "\n" args)]
+     (pp/pprint (lexer args tokens-table)))))
 
 (comment
   tokens-table
   (-main "let")
   (-main "= ")
-  (-main "let x = 4; x == 5 ? 1 : 0;")
+  (-main "let x = 4;\n x == 5 ? 1 : 0;")
   (-main "$$"))
