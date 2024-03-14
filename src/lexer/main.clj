@@ -33,7 +33,7 @@
         token (or (get table (str a b))
                   (get table a)
                   :illegal)]
-    (->TokenLiteral token (str a))))
+    (->TokenLiteral token (str a b))))
 ;;
 
 (defn lexer
@@ -50,8 +50,7 @@
                                   :else (lex-other cs tokens-table))
                   literal-length (-> token-literal :literal str count)
                   cs (->> (drop literal-length cs))]
-              (recur cs
-                     (conj! acc token-literal))))))
+              (recur cs (conj! acc token-literal))))))
 ;;
 
 (def tokens-table
