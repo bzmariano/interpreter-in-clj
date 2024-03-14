@@ -30,10 +30,12 @@
 (defn tokenize-other
   [string table]
   (let [[a b] string
-        token (or (get table (str a b))
-                  (get table a)
-                  :illegal)]
-    (->token-literal token (str a b))))
+        double-tk (get table (str a b))
+        single-tk (get table a)]
+    (cond
+      double-tk (->token-literal double-tk (str a b))
+      single-tk (->token-literal single-tk (str a))
+      :else (->token-literal :illegal (str a)))))
 ;;
 
 (defn tokenizer
