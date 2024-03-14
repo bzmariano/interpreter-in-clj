@@ -29,11 +29,11 @@
  "<=" :geq
  ">=" :leq
  "let" :let
- "const " :const
- "for" :for
  "if" :if
  "else" :else
  "func" :func
+ "true" :bool
+ "false" :bool
  "return" :ret}
 
 
