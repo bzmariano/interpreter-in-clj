@@ -1,8 +1,8 @@
-(ns lexer.main-test
+(ns tokenizer.main-test
   (:require
    [clojure.edn :as edn]
    [clojure.test :refer [deftest testing is run-tests]]
-   [lexer.main :as main]))
+   [tokenizer.main :as main]))
 
 #_(run-tests)
 
@@ -20,9 +20,9 @@
     return add(x, 10);
   }")
 
-(deftest lexer-valid-chars
-  (testing "Testing lexer with all allowed chars"
-    (is (= (main/lexer valid-code-string tokens-table)
+(deftest tokenize
+  (testing "Testing tokenizer"
+    (is (= (main/tokenizer valid-code-string tokens-table)
            [{:token :let :literal "let"}
             {:token :ident :literal "x"}
             {:token :assign :literal "="}
